@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Studio | 스마트 PDF 병합 및 변환기</title>
+  <meta name="description" content="순수 브라우저 기반으로 안전하고 빠른 PDF 합치기 및 Word/PPT 문서 변환 웹 애플리케이션">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- CDN Libraries: pdf-lib, pdf.js, docx, pptxgenjs -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <!-- Google Identity Services (Google Official OAuth & Sign-In) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div id="app" class="app-container">
+    
+    <!-- Global Header -->
+    <header class="main-header">
+      <div class="header-content">
+        <div class="logo-area">
+          <div class="logo-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div>
+            <h1 class="logo-title">PDF Studio <span class="badge-pro">PRO</span></h1>
+            <p class="logo-subtitle">초고속 무손실 PDF 병합 & 문서 변환기</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="privacy-badge" title="파일이 외부 서버로 전송되지 않고 브라우저 내에서 100% 안전하게 처리됩니다.">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+            <span>100% 온디바이스 보안</span>
+          </div>
+
+          <!-- Authentication Area -->
+          <div id="authContainer" class="auth-container">
+            <!-- Non-logged in: Login Button -->
+            <button type="button" id="openLoginModalBtn" class="btn btn-login-google" aria-label="구글 로그인">
+              <svg class="google-svg-icon" width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span>Google 로그인</span>
+            </button>
+
+            <!-- Theme Toggle Button -->
+            <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="테마 전환" title="다크/라이트 모드 전환">
+              <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <!-- Logged in: Profile Chip -->
+            <div id="userProfileChip" class="user-profile-chip" style="display: none;">
+              <div id="userAvatarCircle" class="user-avatar-circle" title="프로필">G</div>
+              <div class="user-chip-meta">
+                <div class="user-chip-row">
+                  <span id="userChipName" class="user-chip-name">사용자</span>
+                  <span id="userChipBadge" class="user-chip-badge badge-pending">대기중</span>
+                </div>
+                <span id="userChipEmail" class="user-chip-email">user@gmail.com</span>
+              </div>
+              <div class="user-chip-actions">
+                <button type="button" id="requestPermFromChipBtn" class="chip-action-btn chip-req-btn" style="display: none;" title="사용 권한 요청">
+                  권한 요청
+                </button>
+                <button type="button" id="userLogoutBtn" class="chip-action-btn chip-logout-btn" title="로그아웃">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                  <span>로그아웃</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button id="tabMerge" class="tab-btn active" data-tab="mergeSection">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="8" y="2" width="13" height="13" rx="2"></rect>
+            <path d="M4 8H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"></path>
+          </svg>
+          <span>PDF 여러 개 병합하기</span>
+          <span id="mergeTabBadge" class="tab-badge" style="display: none;">0</span>
+        </button>
+        <button id="tabConvert" class="tab-btn" data-tab="convertSection">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+          <span>PDF를 Word / PPT로 변환</span>
+        </button>
+
+        <!-- Admin Only Tab (Strictly hidden for non-admin) -->
+        <button id="tabAdmin" class="tab-btn tab-admin-special" data-tab="adminSection" style="display: none;" title="관리자 전용 콘솔">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>관리자 콘솔 (권한/통계)</span>
+          <span id="adminPendingBadge" class="tab-badge admin-pending-badge" style="display: none;">0</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-wrapper">
+      
+      <!-- ================= SECTION 1: PDF MERGER ================= -->
+      <section id="mergeSection" class="feature-section active">
+        
+        <!-- Live Sequence Strip (상단에 파일이 합쳐지는 순서를 먼저 볼 수 있는 전용 영역) -->
+        <div id="sequenceStripContainer" class="sequence-strip-wrapper">
+          <div class="sequence-header">
+            <div class="sequence-title-group">
+              <span class="pulse-indicator"></span>
+              <h2 class="sequence-title">병합 순서 흐름도</h2>
+              <span class="sequence-hint">문서가 아래 화살표 순서대로 앞에서부터 결합됩니다. 순서를 바꾸려면 아래 목록에서 카드를 드래그하거나 이동 버튼을 누르세요.</span>
+            </div>
+            <div class="sequence-stats">
+              <span class="stat-pill"><strong id="seqTotalFiles">0</strong>개 파일</span>
+              <span class="stat-pill"><strong id="seqTotalPages">0</strong>페이지 전체</span>
+            </div>
+          </div>
+          
+          <div id="sequenceStrip" class="sequence-strip">
+            <div class="sequence-empty">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>PDF 파일을 업로드하면 여기에 결합 순서 흐름도가 실시간으로 표시됩니다.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload Dropzone -->
+        <div class="card upload-card">
+          <div id="mergeDropzone" class="dropzone">
+            <input type="file" id="mergeFileInput" accept="application/pdf" multiple class="file-input-hidden">
+            <div class="dropzone-inner">
+              <div class="drop-icon-wrapper">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <h3 class="dropzone-title">병합할 PDF 파일들을 여기에 끌어다 놓으세요</h3>
+              <p class="dropzone-subtitle">여러 파일을 한꺼번에 선택하거나 추가로 계속 드래그할 수 있습니다</p>
+              
+              <div class="dropzone-buttons">
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('mergeFileInput').click()">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  파일 선택하기
+                </button>
+                <button type="button" id="loadSamplePdfsBtn" class="btn btn-secondary" title="샘플 PDF 3개를 즉시 생성하여 기능을 체험해 봅니다">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  샘플 PDF 3개 자동 생성해보기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- File List & Controls -->
+        <div id="fileListSection" class="file-list-container" style="display: none;">
+          <div class="list-toolbar">
+            <div class="toolbar-left">
+              <h3 class="section-title">업로드된 파일 목록 (<span id="fileCountBadge">0</span>)</h3>
+              <span class="toolbar-guide">💡 드래그하여 순서를 자유롭게 변경할 수 있습니다</span>
+            </div>
+            
+            <div class="toolbar-right">
+              <div class="sort-dropdown-group">
+                <button type="button" id="sortNameAscBtn" class="btn-sm btn-subtle" title="파일명 오름차순(A-Z) 정렬">A-Z 정렬</button>
+                <button type="button" id="sortNameDescBtn" class="btn-sm btn-subtle" title="파일명 내림차순(Z-A) 정렬">Z-A 정렬</button>
+                <button type="button" id="reverseOrderBtn" class="btn-sm btn-subtle" title="현재 순서 앞뒤 뒤집기">순서 반전</button>
+                <button type="button" id="clearAllFilesBtn" class="btn-sm btn-danger-subtle" title="모든 파일 삭제">모두 삭제</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sortable File Cards Grid/List -->
+          <ul id="fileCardsList" class="file-cards-list">
+            <!-- Rendered by JavaScript -->
+          </ul>
+
+          <!-- Merge Execution Panel -->
+          <div class="merge-action-panel card">
+            <div class="merge-options-grid">
+              <div class="option-field">
+                <label for="mergedFileName" class="field-label">저장될 파일명</label>
+                <div class="input-with-ext">
+                  <input type="text" id="mergedFileName" value="merged_document" placeholder="파일명 입력">
+                  <span class="ext-badge">.pdf</span>
+                </div>
+              </div>
+
+              <div class="option-field">
+                <label class="field-label">병합 부가 옵션</label>
+                <div class="checkbox-options">
+                  <label class="custom-checkbox">
+                    <input type="checkbox" id="optAddPageNumbers">
+                    <span class="checkmark"></span>
+                    <span>하단에 페이지 번호 매기기 (1, 2, 3...)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="merge-submit-area">
+              <div class="summary-info">
+                <span>총 <strong id="summaryFileCount">0</strong>개 문서</span>
+                <span class="divider">·</span>
+                <span>총 <strong id="summaryPageCount">0</strong>페이지</span>
+                <span class="divider">·</span>
+                <span id="summaryTotalSize">0 MB</span>
+              </div>
+              <button type="button" id="startMergeBtn" class="btn btn-glowing btn-xl">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="8 17 12 21 16 17"></polyline>
+                  <line x1="12" y1="12" x2="12" y2="21"></line>
+                  <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path>
+                </svg>
+                <span>하나의 PDF로 병합하기</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Merge Result Card (Hidden until merged) -->
+          <div id="mergeResultCard" class="card result-card" style="display: none;">
+            <div class="result-header">
+              <div class="success-icon-badge">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div>
+                <h3 class="result-title">PDF 병합이 성공적으로 완료되었습니다!</h3>
+                <p id="resultInfoText" class="result-subtitle">총 3개 파일 (12페이지) · 2.4 MB</p>
+              </div>
+            </div>
+
+            <div class="result-actions">
+              <button type="button" id="downloadMergedBtn" class="btn btn-primary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>병합된 PDF 다운로드</span>
+              </button>
+              <button type="button" id="previewMergedBtn" class="btn btn-secondary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span>브라우저에서 미리보기</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 2: PDF CONVERTER ================= -->
+      <section id="convertSection" class="feature-section" style="display: none;">
+        <div class="section-intro">
+          <h2 class="intro-heading">PDF 문서 변환기</h2>
+          <p class="intro-desc">PDF 파일을 <strong>워드 문서(.docx)</strong> 또는 <strong>파워포인트 발표 자료(.pptx)</strong>로 간편하게 변환합니다.</p>
+        </div>
+
+        <div class="converter-layout">
+          <!-- Left: Upload & Target Selection -->
+          <div class="converter-main-card card">
+            
+            <!-- Conversion Format Selector -->
+            <div class="format-selection-group">
+              <label class="field-label">변환할 대상 포맷 선택</label>
+              <div class="format-pills">
+                <button type="button" class="format-pill active" data-format="docx" id="formatWordBtn">
+                  <div class="format-pill-icon word-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                  </div>
+                  <div class="format-pill-text">
+                    <strong>Word 문서 (.docx)</strong>
+                    <span>편집 가능한 텍스트 & 레이아웃</span>
+                  </div>
+                  <span class="active-check">✓</span>
+                </button>
+
+                <button type="button" class="format-pill" data-format="pptx" id="formatPptBtn">
+                  <div class="format-pill-icon ppt-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </div>
+                  <div class="format-pill-text">
+                    <strong>PowerPoint (.pptx)</strong>
+                    <span>페이지별 슬라이드 & 프레젠테이션</span>
+                  </div>
+                  <span class="active-check">✓</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Converter Dropzone -->
+            <div id="convertDropzone" class="dropzone convert-dropzone">
+              <input type="file" id="convertFileInput" accept="application/pdf" class="file-input-hidden">
+              <div class="dropzone-inner">
+                <div class="drop-icon-wrapper convert-icon-glow">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 16 12 12 8 16"></polyline>
+                    <line x1="12" y1="12" x2="12" y2="21"></line>
+                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+                    <polyline points="16 16 12 12 8 16"></polyline>
+                  </svg>
+                </div>
+                <h3 class="dropzone-title">변환할 PDF 파일을 선택하거나 드래그하세요</h3>
+                <p class="dropzone-subtitle" id="convertSubText">선택된 포맷: Word 문서 (.docx)</p>
+                <div class="dropzone-buttons">
+                  <button type="button" class="btn btn-primary" onclick="document.getElementById('convertFileInput').click()">
+                    파일 선택하기
+                  </button>
+                  <button type="button" id="loadConvertSampleBtn" class="btn btn-secondary">
+                    샘플 PDF로 테스트
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected File Info for Conversion (Hidden initially) -->
+            <div id="convertSelectedFileInfo" class="selected-convert-file card" style="display: none;">
+              <div class="file-info-left">
+                <canvas id="convertThumbCanvas" class="convert-thumb"></canvas>
+                <div class="file-meta-col">
+                  <h4 id="convertFileName" class="convert-filename">document.pdf</h4>
+                  <div class="meta-row">
+                    <span id="convertPageCount" class="badge-tag">총 0 페이지</span>
+                    <span id="convertFileSize" class="badge-tag">0 KB</span>
+                  </div>
+                </div>
+              </div>
+              <button type="button" id="removeConvertFileBtn" class="btn-icon-subtle" title="다른 파일 선택">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Conversion Options Accordion -->
+            <div class="conversion-settings card">
+              <h4 class="settings-title">변환 상세 설정</h4>
+              
+              <!-- Word Specific Settings -->
+              <div id="wordSettingsBlock" class="format-settings-block">
+                <div class="radio-option-group">
+                  <label class="custom-radio">
+                    <input type="radio" name="wordMode" value="smart" checked>
+                    <span class="radio-mark"></span>
+                    <div class="radio-text">
+                      <strong>스마트 텍스트 & 서식 모드 (추천)</strong>
+                      <small>PDF 내의 텍스트, 단락, 줄바꿈을 추출하여 워드에서 자유롭게 타이핑 및 내용 수정이 가능합니다.</small>
+                    </div>
+                  </label>
+                  <label class="custom-radio">
+                    <input type="radio" name="wordMode" value="layout">
+                    <span class="radio-mark"></span>
+                    <div class="radio-text">
+                      <strong>고해상도 페이지 레이아웃 보존 모드</strong>
+                      <small>각 페이지를 고화질 렌더링하여 워드 문서에 원본 서식 그대로 1:1 삽입합니다.</small>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- PPT Specific Settings (세부정보 기반 재수정 모드) -->
+              <div id="pptSettingsBlock" class="format-settings-block" style="display: none;">
+                <label class="field-label mb-2">PPT 변환 방식 선택</label>
+                <div class="radio-option-group">
+                  <label class="custom-radio">
+                    <input type="radio" name="pptMode" value="editable" checked>
+                    <span class="radio-mark"></span>
+                    <div class="radio-text">
+                      <div class="radio-title-row">
+                        <strong>세부정보 기반 완전 재수정 모드 (추천)</strong>
+                        <span class="badge-recommend">재수정 가능</span>
+                      </div>
+                      <small>PDF 내의 글자, 위치(X·Y 좌표), 글꼴 크기, 굵기를 분석하여 파워포인트에서 직접 클릭하고 내용을 타이핑·수정할 수 있는 <strong>실제 텍스트 상자(Text Box)</strong>로 생성합니다.</small>
+                    </div>
+                  </label>
+
+                  <label class="custom-radio">
+                    <input type="radio" name="pptMode" value="hybrid">
+                    <span class="radio-mark"></span>
+                    <div class="radio-text">
+                      <div class="radio-title-row">
+                        <strong>원본 디자인 배경 유지 + 편집 텍스트 오버레이 모드</strong>
+                        <span class="badge-recommend">디자인+수정</span>
+                      </div>
+                      <small>원본 PDF의 배경 디자인, 로고, 도형을 슬라이드 배경으로 유지하면서, 모든 텍스트를 정확한 위치에 편집 가능한 텍스트 상자로 얹어 원본 레이아웃과 재수정 편의를 모두 제공합니다.</small>
+                    </div>
+                  </label>
+
+                  <label class="custom-radio">
+                    <input type="radio" name="pptMode" value="image">
+                    <span class="radio-mark"></span>
+                    <div class="radio-text">
+                      <div class="radio-title-row">
+                        <strong>고화질 단순 이미지 슬라이드 모드</strong>
+                      </div>
+                      <small>텍스트 수정 없이 각 페이지를 고해상도 그래픽 이미지로 슬라이드에 1:1 배치합니다.</small>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="form-grid-2col mt-3">
+                  <div class="form-row">
+                    <label class="field-label" for="pptFontFamily">기본 적용 글꼴</label>
+                    <select id="pptFontFamily" class="custom-select">
+                      <option value="Malgun Gothic" selected>맑은 고딕 (Malgun Gothic)</option>
+                      <option value="Pretendard">Pretendard</option>
+                      <option value="Arial">Arial</option>
+                      <option value="Calibri">Calibri</option>
+                      <option value="NanumGothic">나눔고딕</option>
+                    </select>
+                  </div>
+
+                  <div class="form-row">
+                    <label class="field-label" for="pptAspectRatio">슬라이드 화면 비율</label>
+                    <select id="pptAspectRatio" class="custom-select">
+                      <option value="16:9" selected>16:9 와이드스크린 (기본)</option>
+                      <option value="4:3">4:3 표준 화면비</option>
+                      <option value="A4">A4 용지 규격 비율</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="checkbox-row-group mt-3">
+                  <label class="custom-checkbox">
+                    <input type="checkbox" id="pptSmartCluster" checked>
+                    <span class="checkmark"></span>
+                    <span>지능형 문장/단락 자동 결합 (단어 파편화를 방지하여 수정 편의성 향상)</span>
+                  </label>
+                  <label class="custom-checkbox mt-1">
+                    <input type="checkbox" id="pptAddNotes" checked>
+                    <span class="checkmark"></span>
+                    <span>슬라이드 발표자 노트에 각 페이지 텍스트 자동 삽입</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conversion Submit Button -->
+            <div class="convert-submit-wrapper">
+              <button type="button" id="startConvertBtn" class="btn btn-glowing btn-xl w-100" disabled>
+                <span id="convertBtnText">PDF를 Word(.docx)로 변환하기</span>
+              </button>
+            </div>
+
+            <!-- Conversion Progress Bar (Hidden during idle) -->
+            <div id="convertProgressWrapper" class="progress-container" style="display: none;">
+              <div class="progress-header">
+                <span id="progressStatusLabel">변환 처리 중...</span>
+                <span id="progressPercentLabel">0%</span>
+              </div>
+              <div class="progress-bar-track">
+                <div id="progressBarFill" class="progress-bar-fill"></div>
+              </div>
+            </div>
+
+            <!-- Conversion Result Box (Hidden initially) -->
+            <div id="convertResultBox" class="card result-card" style="display: none;">
+              <div class="result-header">
+                <div class="success-icon-badge">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="result-title">문서 변환이 완료되었습니다!</h3>
+                  <p id="convertResultDesc" class="result-subtitle">변환된 파일을 다운로드할 준비가 되었습니다.</p>
+                </div>
+              </div>
+              <div class="result-actions">
+                <button type="button" id="downloadConvertedBtn" class="btn btn-primary btn-lg">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span id="downloadConvertedBtnText">변환된 Word 파일 다운로드</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3: ADMIN CONSOLE (bosung3116@gmail.com ONLY) ================= -->
+      <section id="adminSection" class="feature-section admin-section" style="display: none;">
+        <!-- Admin Section Header -->
+        <div class="admin-header-card">
+          <div class="admin-header-main">
+            <div class="admin-shield-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="admin-title-row">
+                <h2 class="admin-title">관리자 콘솔 & 통계 대시보드</h2>
+                <span class="badge-admin-crown">👑 최고 관리자 전용</span>
+              </div>
+              <p class="admin-subtitle">
+                접속 관리자: <strong>bosung3116@gmail.com</strong> · 페이지 사용 권한 요청 승인 및 사용자별 이용 통계를 통합 관리합니다. (일반 사용자에게는 절대 노출되지 않습니다)
+              </p>
+            </div>
+          </div>
+
+          <div class="admin-header-toolbar">
+            <button type="button" id="adminRefreshBtn" class="btn btn-secondary btn-sm" title="데이터 새로고침">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>새로고침</span>
+            </button>
+            <button type="button" id="adminExportCsvBtn" class="btn btn-secondary btn-sm" title="사용 통계 CSV 파일 다운로드">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>통계 CSV 내보내기</span>
+            </button>
+            <button type="button" id="adminSeedDemoBtn" class="btn btn-subtle btn-sm" title="테스트용 데모 데이터 채우기">
+              <span>+ 데모 데이터 추가</span>
+            </button>
+            <button type="button" id="adminResetDataBtn" class="btn btn-subtle btn-sm text-danger" title="모든 통계 및 요청 초기화">
+              <span>초기화</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Google Apps Script Cloud Sync Card -->
+        <div class="admin-gas-sync-card" id="adminGasSyncCard">
+          <div class="gas-card-header">
+            <div class="gas-brand-wrap">
+              <div class="gas-icon-badge">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#4285F4"/>
+                  <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#34A853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="gas-brand-text">
+                <div class="gas-title-row">
+                  <h3 class="gas-title">Google Apps Script 실시간 클라우드 연동</h3>
+                  <span id="gasStatusBadge" class="gas-status-badge badge-gas-ready">
+                    <span class="status-dot"></span> <span id="gasStatusText">연동 준비 완료</span>
+                  </span>
+                  <span class="gas-deploy-chip" title="배포 ID">
+                    ID: <code>AKfycbx2HG6...</code>
+                  </span>
+                </div>
+                <p class="gas-desc">
+                  배포된 Google Apps Script Web App과 실시간으로 통신하여 <strong>웹페이지 방문자</strong>와 <strong>각 기능의 실시간 사용량 데이터</strong>를 전송 및 모니터링합니다.
+                </p>
+              </div>
+            </div>
+            <div class="gas-actions-group">
+              <button type="button" id="gasSyncNowBtn" class="btn btn-gas-sync">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span id="gasSyncBtnLabel">⚡ Apps Script에 지금 기록</span>
+              </button>
+              <button type="button" id="gasFetchNowBtn" class="btn btn-secondary btn-sm" title="Apps Script에서 최신 데이터 가져오기">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                <span>실시간 데이터 갱신</span>
+              </button>
+              <button type="button" id="toggleGasConfigBtn" class="btn btn-subtle btn-sm" title="Apps Script 설정 및 테스트">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <span>연동 설정 / 진단</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="gas-meta-bar">
+            <div class="gas-meta-item">
+              <span class="meta-label">연동 WebApp URL:</span>
+              <span class="meta-value code-chip" id="gasDisplayUrl">https://script.google.com/macros/s/.../exec</span>
+            </div>
+            <div class="gas-meta-item">
+              <span class="meta-label">마지막 실시간 동기화:</span>
+              <span id="gasLastSyncTime" class="meta-value font-weight-bold">-</span>
+            </div>
+            <div class="gas-meta-item">
+              <span class="meta-label">실시간 연동 주기:</span>
+              <span id="gasSyncStatusIndicator" class="meta-value status-indicator-text">작업 시 즉시 전송 (30초 자동)</span>
+            </div>
+            <div class="gas-meta-item">
+              <span class="meta-label">실시간 자동 동기화:</span>
+              <label class="drive-toggle-label">
+                <input type="checkbox" id="gasAutoSyncToggle" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">실시간 자동 동기화</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- GAS Configuration & Diagnostic Panel (Accordion) -->
+          <div id="gasConfigPanel" class="gas-config-panel" style="display: none;">
+            <div class="gas-config-inner">
+              <div class="gas-config-header">
+                <h4>🛠️ Google Apps Script 배포 설정 및 연결 진단</h4>
+                <span class="gas-badge-status" id="gasPingResultBadge">연결 테스트 대기</span>
+              </div>
+
+              <!-- Permission Warning / Guide Banner -->
+              <div class="gas-perm-guide-banner">
+                <div class="guide-banner-icon">💡</div>
+                <div class="guide-banner-text">
+                  <strong>Google Apps Script 배포 권한 안내 (401 / 302 리디렉션 방지 필수 설정)</strong>
+                  <p>
+                    Apps Script 편집기 상단 <strong>[배포] ➔ [배포 관리] ➔ [수정(연필 아이콘)]</strong>을 클릭하신 후,<br>
+                    <strong>액세스할 수 있는 사용자(Who has access)</strong>를 반드시 <code>모든 사용자 (Anyone)</code>로 지정해 주셔야 웹페이지에서 API Key로 실시간 통신이 가능합니다. (실행자는 '나(bosung3116@gmail.com)'로 유지)
+                  </p>
+                </div>
+              </div>
+
+              <div class="gas-inputs-grid">
+                <div class="form-group">
+                  <label class="form-label" for="gasWebappUrlInput">Apps Script Web App URL</label>
+                  <input type="text" id="gasWebappUrlInput" class="form-input" value="https://script.google.com/macros/s/AKfycbx2HG6H8ZcqbtF0lNxY5aZGew4feCk8sMIbPLHQnEYaWpGG7GujQBa7Tjubty5ZyAAw/exec">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="gasApiKeyInput">인증 API Key</label>
+                  <input type="text" id="gasApiKeyInput" class="form-input" placeholder="Google Apps Script 인증 API Key를 입력하세요" value="">
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="d-flex gap-2">
+                  <button type="button" id="gasTestConnectionBtn" class="btn btn-primary btn-sm">
+                    🔍 연결 테스트 (Ping)
+                  </button>
+                  <button type="button" id="gasSaveConfigBtn" class="btn btn-secondary btn-sm">
+                    저장
+                  </button>
+                  <button type="button" id="gasResetConfigBtn" class="btn btn-subtle btn-sm">
+                    기본값 복원
+                  </button>
+                </div>
+                <button type="button" id="toggleGasScriptCodeBtn" class="btn btn-text-subtle btn-sm">
+                  📜 추천 Google Apps Script (Code.gs) 코드 보기
+                </button>
+              </div>
+
+              <!-- Recommended Code.gs Script Box -->
+              <div id="gasRecommendedCodeBox" class="gas-code-box" style="display: none; margin-top: 1rem;">
+                <div class="code-box-header">
+                  <span>추천 Apps Script 코드 (Google 스프레드시트 자동 기록 및 조회)</span>
+                  <button type="button" id="copyGasCodeBtn" class="btn btn-subtle btn-sm">📋 코드 복사</button>
+                </div>
+                <pre class="code-pre" id="gasCodePre"><code>// Google Apps Script (Code.gs)
+const VALID_API_KEY = "YOUR_CUSTOM_API_KEY"; // 관리자 콘솔의 인증 API Key와 동일하게 설정
+
+function doPost(e) {
+  try {
+    const contents = e.postData ? e.postData.contents : "{}";
+    const payload = JSON.parse(contents);
+
+    // API Key 검증
+    if (payload.apiKey !== VALID_API_KEY) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Invalid API Key" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // 1. 요약 시트 업데이트
+    let summarySheet = ss.getSheetByName("요약통계");
+    if (!summarySheet) {
+      summarySheet = ss.insertSheet("요약통계");
+      summarySheet.appendRow(["항목", "값", "마지막 갱신 일시"]);
+    }
+    const sm = payload.analytics?.summary || {};
+    summarySheet.clearContents();
+    summarySheet.appendRow(["항목", "값", "마지막 갱신 일시"]);
+    summarySheet.appendRow(["총 방문자 수", sm.totalVisitors || 0, new Date()]);
+    summarySheet.appendRow(["총 작업 횟수", sm.totalAllFeaturesUsed || 0, new Date()]);
+    summarySheet.appendRow(["PDF 병합 횟수", payload.analytics?.featureUsage?.pdfMerge?.totalExecutionCount || 0, new Date()]);
+    summarySheet.appendRow(["Word 변환 횟수", payload.analytics?.featureUsage?.wordConvert?.totalExecutionCount || 0, new Date()]);
+    summarySheet.appendRow(["PPT 변환 횟수", payload.analytics?.featureUsage?.pptConvert?.totalExecutionCount || 0, new Date()]);
+
+    // 2. 방문자 로그 시트
+    let visitorSheet = ss.getSheetByName("방문자현황");
+    if (!visitorSheet) {
+      visitorSheet = ss.insertSheet("방문자현황");
+      visitorSheet.appendRow(["방문자ID", "이메일/계정", "기기/브라우저", "방문횟수", "작업횟수", "최근접속일시"]);
+    }
+    if (payload.visitors && Array.isArray(payload.visitors)) {
+      visitorSheet.clearContents();
+      visitorSheet.appendRow(["방문자ID", "이메일/계정", "기기/브라우저", "방문횟수", "작업횟수", "최근접속일시"]);
+      payload.visitors.forEach(v => {
+        visitorSheet.appendRow([v.visitorId, v.email || "익명", v.userAgent, v.visitCount, v.actionsCount, v.lastVisit]);
+      });
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      message: "Data synced successfully",
+      syncedAt: new Date().toISOString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  const key = e.parameter ? e.parameter.apiKey : "";
+  if (key !== VALID_API_KEY) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Invalid API Key" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "success",
+    ping: "pong",
+    time: new Date().toISOString()
+  })).setMimeType(ContentService.MimeType.JSON);
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Google Drive Cloud Sync Card -->
+        <div class="admin-drive-sync-card" id="adminDriveSyncCard">
+          <div class="drive-card-header">
+            <div class="drive-brand-wrap">
+              <div class="drive-icon-badge">
+                <svg width="28" height="28" viewBox="0 0 87.3 78" fill="none">
+                  <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066DA"/>
+                  <path d="M43.65 25 29.9 1.2c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44C.4 49.9 0 51.45 0 53h27.5z" fill="#00AC47"/>
+                  <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 10.1z" fill="#EA4335"/>
+                  <path d="M43.65 25 57.4 1.2C56.05.4 54.5 0 52.95 0H34.35c-1.55 0-3.1.4-4.45 1.2z" fill="#00832D"/>
+                  <path d="M59.8 53H27.5L13.75 76.8c1.35.8 2.9 1.2 4.45 1.2h50.9c1.55 0 3.1-.4 4.45-1.2z" fill="#2684FC"/>
+                  <path d="M73.4 26.5 60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.15 28h27.5c0-1.55-.4-3.1-1.2-4.5z" fill="#FFBA00"/>
+                </svg>
+              </div>
+              <div class="drive-brand-text">
+                <div class="drive-title-row">
+                  <h3 class="drive-title">관리자 Google Drive 데이터 자동 기록</h3>
+                  <span id="driveStatusBadge" class="drive-status-badge badge-drive-ready">
+                    <span class="status-dot"></span> <span id="driveStatusText">연동 대기중</span>
+                  </span>
+                </div>
+                <p class="drive-desc">
+                  관리자의 구글 드라이브에 <code>PDF_Studio_Analytics.json</code> 파일을 생성하여 <strong>웹페이지 방문자</strong>와 <strong>각 기능의 사용량 데이터</strong>를 안전하게 동기화 및 영구 보관합니다.
+                </p>
+              </div>
+            </div>
+            <div class="drive-actions-group">
+              <button type="button" id="driveSyncNowBtn" class="btn btn-drive-sync">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span id="driveSyncBtnLabel">☁️ Google 드라이브에 지금 기록</span>
+              </button>
+              <a id="driveOpenFileLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm drive-open-link" style="display: none;" title="Google Drive 웹에서 파일 열기">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>내 Drive 파일 열기 ↗</span>
+              </a>
+              <button type="button" id="driveDownloadJsonBtn" class="btn btn-subtle btn-sm" title="JSON 백업 파일 로컬 다운로드">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>JSON 백업 다운로드</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="drive-meta-bar">
+            <div class="drive-meta-item">
+              <span class="meta-label">기록 파일:</span>
+              <span class="meta-value code-chip">PDF_Studio_Analytics.json</span>
+            </div>
+            <div class="drive-meta-item">
+              <span class="meta-label">마지막 기록 일시:</span>
+              <span id="driveLastSyncTime" class="meta-value">-</span>
+            </div>
+            <div class="drive-meta-item">
+              <span class="meta-label">집계 방문자 수:</span>
+              <span id="driveVisitorCount" class="meta-value font-weight-bold">0명</span>
+            </div>
+            <div class="drive-meta-item">
+              <span class="meta-label">기능별 총 사용량:</span>
+              <span id="driveTotalActionsCount" class="meta-value font-weight-bold">0회</span>
+            </div>
+            <div class="drive-meta-item">
+              <span class="meta-label">자동 동기화:</span>
+              <label class="drive-toggle-label">
+                <input type="checkbox" id="driveAutoSyncToggle" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">기능 사용 시 자동 기록</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin KPI Summary Grid -->
+        <div class="admin-kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap kpi-blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-label">등록 / 방문 사용자</span>
+              <div class="kpi-value-wrap">
+                <span id="kpiTotalUsers" class="kpi-value">0</span>
+                <span class="kpi-unit">명</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card highlight-pending">
+            <div class="kpi-icon-wrap kpi-warning">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-label">승인 대기 권한 요청</span>
+              <div class="kpi-value-wrap">
+                <span id="kpiPendingRequests" class="kpi-value text-warning">0</span>
+                <span class="kpi-unit">건</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap kpi-purple">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-label">누적 총 작업 횟수</span>
+              <div class="kpi-value-wrap">
+                <span id="kpiTotalActions" class="kpi-value">0</span>
+                <span class="kpi-unit">회</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap kpi-green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-label">누적 처리 페이지 수</span>
+              <div class="kpi-value-wrap">
+                <span id="kpiTotalPages" class="kpi-value">0</span>
+                <span class="kpi-unit">쪽</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Navigation Subtabs -->
+        <div class="admin-subnav-container">
+          <div class="admin-subtabs">
+            <button type="button" id="subtabRequests" class="admin-subtab-btn active" data-subtab="requestsPanel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <polyline points="16 11 18 13 22 9"></polyline>
+              </svg>
+              <span>페이지 권한 요청 관리</span>
+              <span id="subtabPendingCountBadge" class="subtab-badge" style="display: none;">0</span>
+            </button>
+            <button type="button" id="subtabUsage" class="admin-subtab-btn" data-subtab="usagePanel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              <span>누가 얼마나 사용했는가? (사용량 분석)</span>
+            </button>
+            <button type="button" id="subtabLogs" class="admin-subtab-btn" data-subtab="logsPanel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              <span>실시간 작업 감사 로그</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Subpanel 1: Requests Management -->
+        <div id="requestsPanel" class="admin-subpanel active">
+          <div class="panel-header-toolbar">
+            <div class="filter-group">
+              <button type="button" class="filter-chip active" data-filter="all">전체 <span id="filterCountAll">(0)</span></button>
+              <button type="button" class="filter-chip filter-pending" data-filter="pending">대기중 <span id="filterCountPending">(0)</span></button>
+              <button type="button" class="filter-chip" data-filter="approved">승인됨 <span id="filterCountApproved">(0)</span></button>
+              <button type="button" class="filter-chip" data-filter="rejected">거절됨 <span id="filterCountRejected">(0)</span></button>
+            </div>
+            <div class="panel-search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="reqSearchInput" placeholder="이메일, 이름, 사유 검색...">
+            </div>
+            <button type="button" id="openAddUserModalBtn" class="btn btn-primary btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>수동 권한 부여</span>
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>신청자 (Google 계정)</th>
+                  <th>성명 / 소속</th>
+                  <th>신청 목적 및 사유</th>
+                  <th>요청 일시</th>
+                  <th>상태</th>
+                  <th class="text-right">관리 작업</th>
+                </tr>
+              </thead>
+              <tbody id="adminReqTableBody">
+                <!-- Dynamically populated via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          <div id="emptyRequestsNotice" class="admin-empty-state" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <h4>접수된 권한 요청이 없습니다</h4>
+            <p>새로운 사용자가 로그인 후 권한을 요청하면 이곳에 실시간으로 표시됩니다.</p>
+          </div>
+        </div>
+
+        <!-- Admin Subpanel 2: Usage Analytics & Visitors -->
+        <div id="usagePanel" class="admin-subpanel" style="display: none;">
+          <!-- Feature Breakdown Summary Cards -->
+          <div class="features-summary-grid">
+            <div class="feature-stat-card feature-stat-merge">
+              <div class="feature-stat-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+              </div>
+              <div class="feature-stat-info">
+                <span class="feature-stat-label">PDF 병합 기능 총 사용량</span>
+                <div class="feature-stat-val">
+                  <span id="statMergeCount">0</span>
+                  <span class="feature-stat-unit">회</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="feature-stat-card feature-stat-word">
+              <div class="feature-stat-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                </svg>
+              </div>
+              <div class="feature-stat-info">
+                <span class="feature-stat-label">Word (.docx) 변환 사용량</span>
+                <div class="feature-stat-val">
+                  <span id="statWordCount">0</span>
+                  <span class="feature-stat-unit">회</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="feature-stat-card feature-stat-ppt">
+              <div class="feature-stat-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
+              <div class="feature-stat-info">
+                <span class="feature-stat-label">PPT (.pptx) 변환 사용량</span>
+                <div class="feature-stat-val">
+                  <span id="statPptCount">0</span>
+                  <span class="feature-stat-unit">회</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: User Usage Table -->
+          <div class="analytics-sub-section">
+            <div class="panel-header-toolbar">
+              <div class="analytics-title-wrap">
+                <h3 class="panel-title">사용자별 기능 사용량 상세 집계</h3>
+                <p class="panel-desc">사용자별 PDF 병합, Word 변환, PPT 변환의 세부 이용 횟수와 처리 페이지를 집계합니다.</p>
+              </div>
+              <div class="panel-search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="usageSearchInput" placeholder="사용자 이메일/이름 검색...">
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table analytics-table">
+                <thead>
+                  <tr>
+                    <th>사용자 (Google 계정)</th>
+                    <th>권한 등급</th>
+                    <th class="text-center">총 이용 횟수</th>
+                    <th class="text-center">PDF 병합</th>
+                    <th class="text-center">Word 변환</th>
+                    <th class="text-center">PPT 변환</th>
+                    <th class="text-center">총 처리 페이지</th>
+                    <th>최근 사용 일시</th>
+                    <th class="text-right">액션</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsageTableBody">
+                  <!-- Dynamically populated via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            <div id="emptyUsageNotice" class="admin-empty-state" style="display: none;">
+              <div class="empty-icon">📊</div>
+              <h4>아직 기록된 사용 데이터가 없습니다</h4>
+              <p>사용자들이 PDF 병합이나 문서 변환을 실행하면 자동으로 사용량이 누적 집계됩니다.</p>
+            </div>
+          </div>
+
+          <!-- Section 2: Website Visitors Analytics -->
+          <div class="analytics-sub-section" style="margin-top: 2rem;">
+            <div class="panel-header-toolbar">
+              <div class="analytics-title-wrap">
+                <div class="title-with-badge">
+                  <h3 class="panel-title">웹페이지 방문자 (Visitors) 접속 및 활동 통계</h3>
+                  <span id="visitorTotalBadge" class="subtab-badge" style="background: var(--blue); color: white;">총 0명</span>
+                </div>
+                <p class="panel-desc">이 웹페이지에 접속한 방문자 세션, 누적 방문 횟수, 환경 및 로그인 연동 현황을 추적합니다.</p>
+              </div>
+              <div class="panel-search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="visitorSearchInput" placeholder="방문자 ID, 브라우저, 계정 검색...">
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table visitors-table">
+                <thead>
+                  <tr>
+                    <th>방문자 식별자 (Visitor ID)</th>
+                    <th>연동 Google 계정</th>
+                    <th>접속 환경 / 브라우저</th>
+                    <th class="text-center">누적 방문 횟수</th>
+                    <th class="text-center">기능 실행 횟수</th>
+                    <th>최초 방문 일시</th>
+                    <th>최근 방문 일시</th>
+                  </tr>
+                </thead>
+                <tbody id="adminVisitorTableBody">
+                  <!-- Dynamically populated via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            <div id="emptyVisitorNotice" class="admin-empty-state" style="display: none;">
+              <div class="empty-icon">🌐</div>
+              <h4>아직 기록된 방문자 데이터가 없습니다</h4>
+              <p>웹페이지에 방문자가 접속하면 브라우저 정보와 접속 기록이 자동으로 축적됩니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Subpanel 3: Activity Logs -->
+        <div id="logsPanel" class="admin-subpanel" style="display: none;">
+          <div class="panel-header-toolbar">
+            <div class="analytics-title-wrap">
+              <h3 class="panel-title">작업 감사 로그 (Activity History)</h3>
+              <p class="panel-desc">페이지 내에서 발생한 모든 PDF 병합 및 변환 작업의 실시간 타임라인입니다.</p>
+            </div>
+            <button type="button" id="clearLogsBtn" class="btn btn-subtle btn-sm text-danger">로그 비우기</button>
+          </div>
+
+          <div id="adminLogsContainer" class="admin-logs-timeline">
+            <!-- Dynamically populated via JavaScript -->
+          </div>
+          <div id="emptyLogsNotice" class="admin-empty-state" style="display: none;">
+            <div class="empty-icon">📜</div>
+            <h4>기록된 감사 로그가 없습니다</h4>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Modal 1: Google Login Modal -->
+    <div id="googleLoginModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-dialog modal-auth-dialog">
+        <div class="modal-header">
+          <div class="modal-title-wrap auth-header-wrap">
+            <svg class="google-svg-icon" width="26" height="26" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <div>
+              <h3 class="modal-title">Google 계정으로 로그인</h3>
+              <p class="modal-auth-sub">안전하고 빠른 Google OAuth 본인 인증</p>
+            </div>
+          </div>
+          <button type="button" id="closeLoginModalBtn" class="modal-close-btn" aria-label="닫기">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body auth-modal-body">
+          <div class="google-auth-info-banner">
+            <div class="google-shield-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <p>이 웹페이지는 본인 확인 및 Google Drive 클라우드 연동을 위해 <strong>오직 Google 아이디</strong>로만 로그인할 수 있습니다.</p>
+          </div>
+
+          <!-- Official Google OAuth Button / Trigger -->
+          <div class="gsi-container-wrap">
+            <div id="gsiButtonContainer" class="gsi-button-container">
+              <button type="button" class="btn btn-google-primary" id="googlePrimaryLoginBtn" aria-label="Google 계정으로 로그인">
+                <div class="google-icon-bubble">
+                  <svg class="google-svg-icon" width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                  </svg>
+                </div>
+                <span>Google 계정으로 로그인</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Popup Active Status Indicator (Shown while Google popup is open) -->
+          <div id="googleAuthPendingBox" class="google-auth-pending-box" style="display: none;">
+            <div class="spinner-sm google-spinner"></div>
+            <div class="pending-text-wrap">
+              <strong>Google 로그인 팝업 창이 열렸습니다</strong>
+              <p>새로 열린 Google 계정 로그인 팝업 창에서 구글 계정으로 로그인을 완료해 주세요.</p>
+            </div>
+          </div>
+
+          <!-- Google Cloud Client ID Configuration Toggle -->
+          <div class="auth-config-toggle">
+            <button type="button" id="toggleClientIdConfigBtn" class="btn-text-subtle">
+              ⚙️ Google Cloud OAuth Client ID 연동 설정
+            </button>
+            <div id="clientIdConfigBox" class="client-id-config-box" style="display: none;">
+              <p class="config-desc">
+                Google Cloud Console에서 발급받은 <strong>웹 클라이언트 ID</strong>를 등록하시면, 공식 원클릭 One-Tap 및 Google Drive API 자동 토큰이 즉시 연동됩니다.
+              </p>
+              <div class="input-with-icon" style="margin-bottom: 0.5rem;">
+                <input type="text" id="customGoogleClientIdInput" class="form-input" placeholder="659290198207-jo65ar0u3439lp5mf1rbkpmrvqhujmcl.apps.googleusercontent.com" value="659290198207-jo65ar0u3439lp5mf1rbkpmrvqhujmcl.apps.googleusercontent.com">
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" id="saveGoogleClientIdBtn" class="btn btn-secondary btn-sm">저장 및 적용</button>
+                <button type="button" id="resetGoogleClientIdBtn" class="btn btn-subtle btn-sm">초기화</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 2: Access Permission Request Modal -->
+    <div id="accessRequestModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <h3 class="modal-title">페이지 사용 권한 요청</h3>
+            <span class="modal-page-info">시스템 관리자 승인 검토</span>
+          </div>
+          <button type="button" id="closeAccessRequestBtn" class="modal-close-btn" aria-label="닫기">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <form id="accessRequestForm">
+          <div class="modal-body">
+            <div class="request-intro-banner">
+              <div class="intro-icon">🛡️</div>
+              <div class="intro-text">
+                <strong>안전하고 신뢰할 수 있는 도구 활용</strong>
+                <p>관리자에게 사용 목적을 작성하여 권한을 신청해 주세요. 관리자 승인 후 PDF 병합 및 변환 기능을 무제한 사용하실 수 있습니다.</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">신청자 이메일 (Google)</label>
+              <input type="text" id="reqUserEmailDisplay" class="form-input" readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="reqUserNameInput" class="form-label">신청자 성명 / 부서</label>
+              <input type="text" id="reqUserNameInput" class="form-input" placeholder="예: 김민수 / 마케팅팀" required>
+            </div>
+
+            <div class="form-group">
+              <label for="reqReasonInput" class="form-label">사용 목적 및 요청 사유</label>
+              <textarea id="reqReasonInput" class="form-textarea" rows="3" placeholder="예: 연구 자료 및 기획서 문서 병합/Word 변환 작업에 사용하고자 합니다." required></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelAccessRequestBtn">취소</button>
+            <button type="submit" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <span>관리자에게 권한 요청 전송</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 3: Permission Denied / Prompt Modal -->
+    <div id="permissionNoticeModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-header">
+          <h3 class="modal-title">페이지 사용 권한 안내</h3>
+          <button type="button" id="closePermNoticeBtn" class="modal-close-btn" aria-label="닫기">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body text-center" style="padding: 1.5rem;">
+          <div style="font-size: 3rem; margin-bottom: 0.75rem;">🔒</div>
+          <h4 id="permNoticeTitle" style="font-size: 1.15rem; margin-bottom: 0.5rem; font-weight: 700;">사용 권한이 필요합니다</h4>
+          <p id="permNoticeMessage" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem;">
+            이 기능을 사용하려면 관리자의 승인이 필요합니다.
+          </p>
+          <div class="d-flex flex-column gap-2" id="permNoticeActionBtns">
+            <button type="button" id="permNoticeActionBtn" class="btn btn-primary w-100">권한 요청하기</button>
+            <button type="button" class="btn btn-subtle w-100" onclick="document.getElementById('permissionNoticeModal').style.display='none'">닫기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 4: Admin Manual Add User Modal -->
+    <div id="addUserModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3 class="modal-title">사용자 수동 권한 부여</h3>
+          <button type="button" id="closeAddUserBtn" class="modal-close-btn" aria-label="닫기">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <form id="addUserForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="manualUserEmail" class="form-label">Google 이메일</label>
+              <input type="email" id="manualUserEmail" class="form-input" placeholder="user@gmail.com" required>
+            </div>
+            <div class="form-group">
+              <label for="manualUserName" class="form-label">성명 / 소속</label>
+              <input type="text" id="manualUserName" class="form-input" placeholder="이영희 / 디자인팀" required>
+            </div>
+            <div class="form-group">
+              <label for="manualUserStatus" class="form-label">권한 상태 설정</label>
+              <select id="manualUserStatus" class="form-select">
+                <option value="approved" selected>즉시 승인 (사용 가능)</option>
+                <option value="pending">승인 대기</option>
+                <option value="rejected">거절</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('addUserModal').style.display='none'">취소</button>
+            <button type="submit" class="btn btn-primary">사용자 등록 및 저장</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 0: PDF Page Preview Modal -->
+    <div id="previewModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <h3 id="modalDocTitle" class="modal-title">PDF 미리보기</h3>
+            <span id="modalPageIndicator" class="modal-page-info">1 / 1 페이지</span>
+          </div>
+          <button type="button" id="closeModalBtn" class="modal-close-btn" aria-label="닫기">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="preview-canvas-container">
+            <canvas id="modalCanvas"></canvas>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="pagination-controls">
+            <button type="button" id="prevPageBtn" class="btn btn-secondary btn-sm" disabled>
+              ◀ 이전 페이지
+            </button>
+            <span id="modalPaginationText">1 / 1</span>
+            <button type="button" id="nextPageBtn" class="btn btn-secondary btn-sm" disabled>
+              다음 페이지 ▶
+            </button>
+          </div>
+          <button type="button" class="btn btn-subtle" onclick="document.getElementById('previewModal').style.display='none'">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- Global Footer -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <p>© 2026 PDF Studio PRO · 100% 클라이언트 사이드 고속 처리 엔진</p>
+        <p class="footer-sub">모든 데이터는 사용자 브라우저 메모리 상에서만 즉시 처리되며, 외부 서버로 파일이 일체 유출되지 않습니다.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
